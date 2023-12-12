@@ -1,4 +1,5 @@
 import connectDB from "@/app/utils/database";
+import { SignJWT } from "jose";
 import { UserModel } from "@/app/utils/schemaModels";
 import { NextResponse } from "next/server";
 
@@ -11,6 +12,16 @@ export async function POST(request) {
             // ユーザーが存在する場合の処理
             if(reqBody.password === saveUserData.password){
                 // パスワードが正しい場合
+                const secretKey = new TextEncoder().encode("next-market-app-book")
+                const payload = {
+                    email: reqBody.email,
+                }
+                const token = await new SignJWT(payload)
+                    .setProtectedHeader({alg: "HS256"})
+                    .setExpirationTime("1d")
+                    .sign(secretKey)
+
+                console.log(token)
                 return NextResponse.json({message: "ログイン 成功"})
             }else{
                 // パスワードが間違っている場合
